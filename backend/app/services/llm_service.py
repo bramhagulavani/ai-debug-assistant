@@ -8,6 +8,7 @@ stable interface.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import Any, AsyncIterator, Dict, List, Optional, Sequence, Union
 
@@ -41,7 +42,11 @@ class LLMService:
     def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o") -> None:
         """Initialize the service with an OpenAI client and model name."""
 
-        self._client = AsyncOpenAI(api_key=api_key)
+        resolved_api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self._client = AsyncOpenAI(
+            api_key=resolved_api_key,
+            base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+        )
         self._model = model
 
     @property

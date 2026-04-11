@@ -1,8 +1,13 @@
 # AI Debug Assistant
 
+An AI-assisted debugging workspace with three surfaces:
+- Backend API and orchestration layer
+- Frontend web experience
+- VS Code extension integration
+
 ## Architecture
 
-This repository is organized as a three-part product: backend API, frontend web app, and VS Code extension. The current scaffold is intentionally empty so implementation can be added module by module without mixing concerns.
+This repository is organized as a three-part product: backend API, frontend web app, and VS Code extension.
 
 ## Project Layout
 
@@ -11,13 +16,11 @@ ai-debug-assistant/
   backend/
     app/
       api/         # route handlers
-      services/    # llm_service.py, ast_parser.py, vector_service.py
+      services/    # llm_service.py and service abstractions
       models/      # SQLAlchemy + Pydantic schemas
       prompts/     # structured prompt templates
       core/        # config, auth, database session
     tests/
-    Dockerfile
-    requirements.txt
   frontend/
     src/
       components/ # ErrorInput, DiffViewer, AnalysisPanel, Dashboard
@@ -29,7 +32,6 @@ ai-debug-assistant/
     src/webview/        # sidebar panel HTML/CSS/JS
     package.json
   docs/                 # architecture diagram, API reference
-  docker-compose.yml
   README.md
 ```
 
@@ -42,5 +44,26 @@ ai-debug-assistant/
 
 ## Notes
 
-- No implementation files have been added yet.
-- This README is the only populated file in the scaffold for now.
+- Backend currently includes an OpenAI-backed LLM service at backend/app/services/llm_service.py.
+- The LLM service exposes:
+  - LLMService.model
+  - LLMService.generate_response(...)
+  - LLMService.stream_response(...)
+
+## Local Backend Setup
+
+1. Create and activate a virtual environment.
+2. Install dependencies:
+  - pip install python-dotenv openai
+3. Add environment values to a local .env file:
+  - OPENAI_API_KEY=your_key
+  - OPENAI_BASE_URL=https://api.openai.com/v1 (optional)
+
+## Quick Verification
+
+From the project root, run:
+
+python -c "from dotenv import load_dotenv; load_dotenv(); from backend.app.services.llm_service import LLMService; print(LLMService().model)"
+
+Expected output:
+- gpt-4o
