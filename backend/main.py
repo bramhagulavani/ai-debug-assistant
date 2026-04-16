@@ -1,4 +1,4 @@
-"""FastAPI application entry point.
+"""FastAPI application entry point for AI Debugging Assistant.
 
 Run with:
     uvicorn backend.main:app --reload --port 8000
@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.api.analyze import router as analyze_router
+from backend.app.api.stream import router as stream_router
 
 app = FastAPI(
     title="AI Debugging Assistant",
@@ -26,10 +27,10 @@ app.add_middleware(
 )
 
 app.include_router(analyze_router)
+app.include_router(stream_router)
 
 
 @app.get("/health")
-async def health() -> dict[str, str]:
-    """Return service health status for monitoring and readiness checks."""
-
+async def health_check() -> dict:
+    """Health check endpoint — confirms the server is running."""
     return {"status": "ok", "service": "ai-debug-assistant"}

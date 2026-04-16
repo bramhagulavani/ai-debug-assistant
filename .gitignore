@@ -43,3 +43,10 @@ logs/
 .pytest_cache/
 htmlcov/
 .coverage
+.coverage.*
+.mypy_cache/
+.ruff_cache/
+.nox/
+.tox/
+.hypothesis/
+.ipynb_checkpoints/

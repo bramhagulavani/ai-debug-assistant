@@ -50,11 +50,32 @@ ai-debug-assistant/
   - LLMService.generate_response(...)
   - LLMService.stream_response(...)
 
+## Streaming API
+
+The backend now exposes a WebSocket endpoint for token-by-token streaming at `/ws/analyze`.
+
+Request payload:
+
+```json
+{
+  "code": "...",
+  "stack_trace": "...",
+  "filename": "main.py",
+  "language": "python"
+}
+```
+
+Response behavior:
+
+- Plain text frames contain streamed tokens.
+- The final frame is JSON: `{"type":"done","duration_ms":1234}`.
+- Error frames use JSON: `{"type":"error","message":"..."}`.
+
 ## Local Backend Setup
 
 1. Create and activate a virtual environment.
 2. Install dependencies:
-  - pip install python-dotenv openai
+  - pip install -r requirements.txt
 3. Add environment values to a local .env file:
   - OPENAI_API_KEY=your_key
   - OPENAI_BASE_URL=https://api.openai.com/v1 (optional)
@@ -67,3 +88,11 @@ python -c "from dotenv import load_dotenv; load_dotenv(); from backend.app.servi
 
 Expected output:
 - gpt-4o
+
+## WebSocket Smoke Test
+
+To exercise the streaming endpoint end to end, run:
+
+python -m backend.tests.test_stream
+
+This opens a test client connection to `/ws/analyze`, streams tokens to the console, and prints the final duration once the response completes.
