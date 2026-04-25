@@ -109,7 +109,7 @@ async def get_user_by_email(db: AsyncSession, email: str) -> Optional[User]:
         User instance if found, None otherwise.
     """
     result = await db.execute(
-        select(User).where(User.id == User.id, User.email == email)
+        select(User).where(User.email == email)
     )
     return result.scalar_one_or_none()
 

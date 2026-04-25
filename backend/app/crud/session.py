@@ -159,8 +159,7 @@ async def get_sessions_by_project(
     """
     result = await db.execute(
         select(DebugSession)
-        .where(DebugSession.id == DebugSession.id,
-               DebugSession.project_id == project_id)
+        .where(DebugSession.project_id == project_id)
         .order_by(DebugSession.created_at.desc())
         .offset(skip)
         .limit(limit)

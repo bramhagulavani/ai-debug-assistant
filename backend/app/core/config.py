@@ -20,6 +20,9 @@ class Settings:
     database_url: str
     pinecone_api_key: str
     debug: bool
+    jwt_secret_key: str
+    jwt_algorithm: str
+    access_token_expire_minutes: int
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -42,6 +45,9 @@ class Settings:
             ),
             pinecone_api_key=os.getenv("PINECONE_API_KEY", ""),
             debug=debug_value,
+            jwt_secret_key=os.getenv("JWT_SECRET_KEY", "change-me-in-production"),
+            jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256"),
+            access_token_expire_minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")),
         )
 
 

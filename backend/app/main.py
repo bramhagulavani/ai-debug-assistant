@@ -5,6 +5,8 @@ from __future__ import annotations
 from fastapi import FastAPI
 
 from backend.app.api.analyze import router as analyze_router
+from backend.app.api.auth import router as auth_router
+from backend.app.api.stream import router as stream_router
 
 
 def create_app() -> FastAPI:
@@ -23,6 +25,8 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     app.include_router(analyze_router)
+    app.include_router(stream_router)
+    app.include_router(auth_router)
     return app
 
 

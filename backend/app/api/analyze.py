@@ -6,8 +6,8 @@ import time
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
 
+from backend.app.models.schemas import AnalyzeRequest, AnalyzeResponse
 from backend.app.prompts.debug_prompt import build_debug_system_prompt, build_debug_user_prompt
 from backend.app.services.ast_parser import ASTParserService
 from backend.app.services.llm_service import LLMService, LLMMessage, LLMServiceError
@@ -20,7 +20,7 @@ ast_parser_service = ASTParserService()
 llm_service: Optional[LLMService] = None
 
 
-def _get_llm_service() -> LLMService:
+def get_llm_service() -> LLMService:
     """Return a shared LLM service instance, creating it lazily on first use."""
 
     global llm_service
@@ -30,28 +30,6 @@ def _get_llm_service() -> LLMService:
         except Exception as exc:  # noqa: BLE001
             raise LLMServiceError(f"Failed to initialize LLM service: {exc}") from exc
     return llm_service
-
-
-class AnalyzeRequest(BaseModel):
-    """Incoming payload for stack-trace-guided code analysis."""
-
-    code: str = Field(..., min_length=1)
-    stack_trace: str = Field(..., min_length=1)
-    filename: Optional[str] = None
-    language: Optional[str] = None
-
-
-class AnalyzeResponse(BaseModel):
-    """Structured API response returned to the client."""
-
-    success: bool
-    language: str
-    error_type: str
-    error_message: str
-    error_line: Optional[int]
-    error_function: Optional[str]
-    ai_response: str
-    duration_ms: int
 
 
 @router.post("/analyze", response_model=AnalyzeResponse)
@@ -76,7 +54,7 @@ async def analyze_error(request: AnalyzeRequest) -> AnalyzeResponse:
     )
 
     try:
-        llm_response = await _get_llm_service().generate_response(
+        llm_response = await get_llm_service().generate_response(
             messages=[
                 LLMMessage(role="system", content=system_prompt),
                 LLMMessage(role="user", content=user_prompt),
@@ -100,4 +78,4 @@ async def analyze_error(request: AnalyzeRequest) -> AnalyzeResponse:
     )
 
 
-__all__ = ["router", "AnalyzeRequest", "AnalyzeResponse", "analyze_error"]
+__all__ = ["router", "AnalyzeRequest", "AnalyzeResponse", "analyze_error", "get_llm_service"]
