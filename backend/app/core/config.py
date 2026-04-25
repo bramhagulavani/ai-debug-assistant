@@ -23,10 +23,12 @@ class Settings:
     jwt_secret_key: str
     jwt_algorithm: str
     access_token_expire_minutes: int
+    pinecone_index_name: str = "ai-debug-bugs"
 
     @classmethod
     def from_env(cls) -> Settings:
         """Construct settings from environment variables and validate required values."""
+        pinecone_index_name=os.getenv("PINECONE_INDEX_NAME", "ai-debug-bugs"),
 
         openai_api_key = os.getenv("OPENAI_API_KEY", "").strip()
         if not openai_api_key:
