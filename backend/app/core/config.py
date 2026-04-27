@@ -28,8 +28,6 @@ class Settings:
     @classmethod
     def from_env(cls) -> Settings:
         """Construct settings from environment variables and validate required values."""
-        pinecone_index_name=os.getenv("PINECONE_INDEX_NAME", "ai-debug-bugs"),
-
         openai_api_key = os.getenv("OPENAI_API_KEY", "").strip()
         if not openai_api_key:
             raise ValueError("OPENAI_API_KEY is required")
@@ -50,6 +48,7 @@ class Settings:
             jwt_secret_key=os.getenv("JWT_SECRET_KEY", "change-me-in-production"),
             jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256"),
             access_token_expire_minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")),
+            pinecone_index_name=os.getenv("PINECONE_INDEX_NAME", "ai-debug-bugs"),
         )
 
 

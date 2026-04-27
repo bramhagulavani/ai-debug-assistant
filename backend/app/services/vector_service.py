@@ -121,12 +121,34 @@ class VectorService:
         """
         Returns the Pinecone index, creating it if it does not exist.
         Uses serverless spec on AWS us-east-1 (free tier compatible).
+        Recreates the index if it exists with the wrong dimension.
         """
         existing_indexes = [i.name for i in self._pc.list_indexes()]
 
-        if self._index_name not in existing_indexes:
+        if self._index_name in existing_indexes:
+            # Index exists — check dimension
+            index_desc = self._pc.describe_index(self._index_name)
+            existing_dim = index_desc.dimension
+            if existing_dim != 1536:
+                logger.warning(
+                    "Index '%s' exists with dimension %d, but need 1536. "
+                    "Deleting and recreating...",
+                    self._index_name,
+                    existing_dim,
+                )
+                self._pc.delete_index(self._index_name)
+                self._pc.create_index(
+                    name=self._index_name,
+                    dimension=1536,
+                    metric="cosine",
+                    spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+                )
+                logger.info("Recreated index '%s' with dimension 1536.", self._index_name)
+            else:
+                logger.info("Index '%s' found with correct dimension.", self._index_name)
+        else:
             logger.info(
-                "Pinecone index '%s' not found — creating it now.",
+                "Index '%s' not found — creating it now.",
                 self._index_name,
             )
             self._pc.create_index(
@@ -135,9 +157,7 @@ class VectorService:
                 metric="cosine",
                 spec=ServerlessSpec(cloud="aws", region="us-east-1"),
             )
-            logger.info("Pinecone index '%s' created.", self._index_name)
-        else:
-            logger.info("Pinecone index '%s' found.", self._index_name)
+            logger.info("Index '%s' created with dimension 1536.", self._index_name)
 
         return self._pc.Index(self._index_name)
 
